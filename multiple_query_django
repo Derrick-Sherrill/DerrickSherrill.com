@@ -1,0 +1,66 @@
+## models.py ##
+
+
+## User Level Moddel - Auto Creates upon User Sign up ##
+class userlevel(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='userlevel')
+    animals_level = models.IntegerField(default=0)
+    environment_level = models.IntegerField(default=0)
+    health_level = models.IntegerField(default=0)
+    education_level = models.IntegerField(default=0)
+    hospitality_level = models.IntegerField(default=0)
+    community_level = models.IntegerField(default=0)
+    charity_level = models.IntegerField(default=0)
+    sports_level = models.IntegerField(default=0)
+    religion_level = models.IntegerField(default=0)
+    any_level = models.IntegerField(default=0)
+
+
+
+
+## urls.py ##
+
+# ex: /accounts/profile/usernameexample
+path('profile/<username>/', views.mainprofileview, name='mainprofile')
+
+
+## Views.py ##
+
+@login_required
+def mainprofileview(request, username):
+    if request.user.username == username:
+        return render(request, 'Accounts/profile.html')
+    else:
+        userinfo = User.objects.get(username=username)
+        return render(request, 'Accounts/testprofile.html', {"userinfo":userinfo})
+        
+        
+        
+     
+## html file ##
+
+{% extends 'Accounts/base.html' %}
+{% load static %}
+
+{% block content %}
+{{userinfo.username}}
+{{userinfo.userprofile.state}}
+
+<div class="userlevelscontainer">
+  <h3>User Levels:</h3>
+  <h5>Animals Level: {{userinfo.userlevel.animals_level}}</h5>
+  <h5>Environment Level: {{userinfo.userlevel.environment_level}}</h5>
+  <h5>Health Level: {{userinfo.userlevel.health_level}}</h5>
+  <h5>Education Level: {{userinfo.userlevel.education_level}}</h5>
+  <h5>Hospitality Level: {{userinfo.userlevel.hospitality_level}}</h5>
+  <h5>Community Level: {{userinfo.userlevel.community_level}}</h5>
+  <h5>Charity Level: {{userinfo.userlevel.charity_level}}</h5>
+  <h5>Sports Level: {{userinfo.userlevel.sports_level}}</h5>
+  <h5>Religion Level: {{userinfo.userlevel.religion_level}}</h5>
+  <h5>Any Level: {{userinfo.userlevel.any_level}}</h5>
+</div>
+{% endblock %}
+
+
+
+
