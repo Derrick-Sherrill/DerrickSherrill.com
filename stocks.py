@@ -22,4 +22,4 @@ print(percentage_change)
 last_change = percentage_change[-1]
 
 if abs(last_change) > 0.0004:
-    print("MSFT Alert:" + last_change)
+    print("MSFT Alert:" + str(last_change))
