@@ -1,3 +1,10 @@
+'''
+Video Tutorial: https://youtu.be/1Kcco6koC34
+
+Description: Better Techniques to automate excel reporting using pandas and python.
+'''
+
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt

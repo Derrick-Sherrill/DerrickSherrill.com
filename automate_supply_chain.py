@@ -1,3 +1,11 @@
+'''
+Partial talk through of how I used this script found in this video:
+https://youtu.be/x01N1kIQhUs
+
+Description:
+AWS SageMaker script I used in automating a supply chain at my previous employer
+'''
+
 %matplotlib inline
 
 import sys
@@ -74,7 +82,7 @@ time_series=[] #Defines the structure of the time series data
 for i in range(num_timeseries):
     index = pd.DatetimeIndex(start=t0, freq=freq, periods=data_length)
     time_series.append(pd.Series(data=data.iloc[:,i], index=index)) #Must treat this dynamically, so for loop (Length changes monthly)
-       
+
 print(time_series[2]) #Visual to make sure data is loaded correctly. No Graph = no bueno amigo
 time_series[2].plot()
 plt.show()
@@ -82,7 +90,7 @@ plt.show()
 time_series_training = [] #Creates structure of our training data
 for ts in time_series:
     time_series_training.append(ts[:-prediction_length]) #appends everything except the prediction length, default of five months because that's what we're predicting
-    
+
 time_series[2].plot(label='test')
 time_series_training[2].plot(label='train', ls=':') #Fancy way of determining what we want the model to predict later
 plt.legend()
@@ -96,7 +104,7 @@ def series_to_obj(ts, cat=None):
 
 def series_to_jsonline(ts, cat=None):
     return json.dumps(series_to_obj(ts, cat)) #Most annoying process is conversion to JSON data type - makes it easier to dump excel data
-    
+
 encoding = "utf-8"  #Takes JSON to unicode b/c have to encode data for s3 writing
 s3filesystem = s3fs.S3FileSystem()  # Data: Excel -> Dataframe -> series appended -> JSON -> UTF-8 byte type -> S3 Bucket JSON. Brutal Dude
 
@@ -109,7 +117,7 @@ with s3filesystem.open(s3_data_path + "/test/test.json", 'wb') as fp:
     for ts in time_series:
         fp.write(series_to_jsonline(ts).encode(encoding))
         fp.write('\n'.encode(encoding))
-        
+
 estimator = sagemaker.estimator.Estimator(
     sagemaker_session=sagemaker_session,
     image_name=image_name,
@@ -138,7 +146,7 @@ estimator.set_hyperparameters(**hyperparameters)
 
 %%time
 data_channels = {
-    
+
     "train": "{}/train/".format(s3_data_path),
     "test": "{}/test/".format(s3_data_path)
 }
@@ -160,40 +168,40 @@ class DeepARPredictor(sagemaker.predictor.RealTimePredictor):
     def set_prediction_parameters(self, freq, prediction_length):
         """Set the time frequency and prediction length parameters. This method **must** be called
         before being able to use `predict`.
-        
+
         Parameters:
         freq -- string indicating the time frequency
         prediction_length -- integer, number of predicted time points
-        
+
         Return value: none.
         """
         self.freq = freq
         self.prediction_length = prediction_length
-        
+
     def predict(self, ts, cat=None, encoding="utf-8", num_samples=100, quantiles=["0.1", "0.75", "0.9"]):
         """Requests the prediction of for the time series listed in `ts`, each with the (optional)
         corresponding category listed in `cat`.
-        
+
         Parameters:
         ts -- list of `pandas.Series` objects, the time series to predict
         cat -- list of integers (default: None)
         encoding -- string, encoding to use for the request (default: "utf-8")
         num_samples -- integer, number of samples to compute at prediction time (default: 100)
         quantiles -- list of strings specifying the quantiles to compute (default: ["0.1", "0.5", "0.9"])
-        
+
         Return value: list of `pandas.DataFrame` objects, each containing the predictions
         """
         prediction_times = [x.index[-1]+1 for x in ts]
         req = self.__encode_request(ts, cat, encoding, num_samples, quantiles)
         res = super(DeepARPredictor, self).predict(req)
         return self.__decode_response(res, prediction_times, encoding)
-    
+
     def __encode_request(self, ts, cat, encoding, num_samples, quantiles):
         instances = [series_to_obj(ts[k], cat[k] if cat else None) for k in range(len(ts))]
         configuration = {"num_samples": num_samples, "output_types": ["quantiles"], "quantiles": quantiles}
         http_request_data = {"instances": instances, "configuration": configuration}
         return json.dumps(http_request_data).encode(encoding)
-    
+
     def __decode_response(self, response, prediction_times, encoding):
         response_data = json.loads(response.decode(encoding))
         list_of_df = []
@@ -201,8 +209,8 @@ class DeepARPredictor(sagemaker.predictor.RealTimePredictor):
             prediction_index = pd.DatetimeIndex(start=prediction_times[k], freq=self.freq, periods=self.prediction_length)
             list_of_df.append(pd.DataFrame(data=response_data['predictions'][k]['quantiles'], index=prediction_index))
         return list_of_df
-        
-        
+
+
  predictor = DeepARPredictor(
     endpoint=endpoint_name,
     sagemaker_session=sagemaker_session,
@@ -222,10 +230,9 @@ for k in range(len(list_of_df)):
     list_of_df[k]['0.75'].plot(label='prediction median')
     plt.legend()
     plt.show()
-    
-    
+
+
 print(predictor.predict(time_series[:4
                                    ]))
-                                   
-sagemaker_session.delete_endpoint(endpoint_name)  #Save my bank account and run this command whenever you're done
 
+sagemaker_session.delete_endpoint(endpoint_name)  #Save my bank account and run this command whenever you're done
