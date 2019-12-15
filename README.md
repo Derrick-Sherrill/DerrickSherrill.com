@@ -17,15 +17,20 @@ Video Tutorial: https://youtu.be/m2Elp9ubY3w
 https://github.com/Derrick-Sherrill/DerrickSherrill.com/blob/master/arbitrary_coins.py
 Description: Return most effective change with user decided coin values
 
-### Auto Website Viewer
-Video Tutorial: https://youtu.be/Dq7yHiCjKrA
-https://github.com/Derrick-Sherrill/DerrickSherrill.com/blob/master/AutoWebsiteViewer.py
-Description: Reload webpages every X seconds
+### Automate a Supply Chain Forecasting
+Video Tutorial: https://youtu.be/x01N1kIQhUs
+https://github.com/Derrick-Sherrill/DerrickSherrill.com/blob/master/automate_supply_chain.py
+Description: AWS Algorithm I used with python to predict supply chain demand numbers.
 
 ### Automate Excel Reporting (The Better Version)
 Video Tutorial: https://youtu.be/1Kcco6koC34
 https://github.com/Derrick-Sherrill/DerrickSherrill.com/blob/master/AutomateExcelReporting.py
 Description: Techniques to Automate Microsoft Excel Reporting
+
+### Auto Website Viewer
+Video Tutorial: https://youtu.be/Dq7yHiCjKrA
+https://github.com/Derrick-Sherrill/DerrickSherrill.com/blob/master/AutoWebsiteViewer.py
+Description: Reload webpages every X seconds
 
 ### Combine Worksheets on Column
 Video Tutorial:
